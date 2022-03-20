@@ -8,7 +8,7 @@ import android.view.View
 class GameView(context : Context?, attrs : AttributeSet?) : View(context, attrs){
 
     private var circleRadius = 20F
-    private var point= Point(0, 0)
+    private var circlePos = Point(0, 0)
 
     // unser "Zeichenstift"
     private val paint = Paint()
@@ -30,9 +30,9 @@ class GameView(context : Context?, attrs : AttributeSet?) : View(context, attrs)
         paint.color = color
     }
 
-    fun setPoint(x: Int, y: Int) {
-        point.x = x
-        point.y = y
+    fun setCirclePos(x: Int, y: Int) {
+        circlePos.x = x
+        circlePos.y = y
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -40,6 +40,6 @@ class GameView(context : Context?, attrs : AttributeSet?) : View(context, attrs)
         val width = canvas.width
 
         // Zeichne Kreis am Punkt Point
-        canvas.drawCircle(point.x.toFloat(), point.y.toFloat(), circleRadius, paint)
+        canvas.drawCircle(circlePos.x.toFloat(), circlePos.y.toFloat(), circleRadius, paint)
     }
 }
