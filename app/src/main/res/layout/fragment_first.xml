@@ -6,12 +6,9 @@
     android:layout_height="match_parent"
     tools:context=".FirstFragment">
 
-    <ImageView
-        android:id="@+id/imageView"
+    <com.example.main.GameView
+        android:id="@+id/gameView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        android:src="@drawable/background"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="5dp" />
+        android:layout_height="match_parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
