@@ -51,7 +51,7 @@ class FirstFragment : Fragment() {
 
         if (action == MotionEvent.ACTION_DOWN) {
             Log.i(TAG,"Action DOWN at ($x, $y)")
-            binding.gameView.setCirclePos(x.toInt(), y.toInt())
+            binding.gameView.setCirclePos(Point(x.toInt(),y.toInt()))
             binding.gameView.invalidate()
         }
 

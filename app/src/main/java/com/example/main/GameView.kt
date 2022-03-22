@@ -35,9 +35,8 @@ class GameView(context : Context?, attrs : AttributeSet?) : View(context, attrs)
     // die von der Oberklasse View bereits bereitgestellt wird
 
     // setter Funktion für die Kreisposition
-    fun setCirclePos(x: Int, y: Int) {
-        circlePos.x = x
-        circlePos.y = y
+    fun setCirclePos(p: Point) {
+        circlePos = p
     }
 
 
