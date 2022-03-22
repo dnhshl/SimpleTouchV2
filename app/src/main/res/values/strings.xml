@@ -4,5 +4,6 @@
 
     <string name="start_game">Starte Spiel durch Klick auf Kreis</string>
     <string name="game_over">%s ms\nStarte neues Spiel durch Klick auf Kreis</string>
+    <string name="highscore_list_item">%s: %s ms</string>
 
 </resources>

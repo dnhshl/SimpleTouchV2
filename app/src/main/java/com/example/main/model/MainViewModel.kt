@@ -2,7 +2,6 @@ package com.example.main.model
 
 import android.graphics.Color
 import android.graphics.Point
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -15,41 +14,29 @@ class MainViewModel: ViewModel() {
     val CIRCLE_COLOR = Color.WHITE
     val BACKGROUND_COLOR = Color.BLUE
     val MAX_CLICKS = 10
+    val MAX_TOP_SCORES = 5
 
     // LiveData
-    private var _circlePos = MutableLiveData<Point>()
-    val circlePos: LiveData<Point>
-        get() = _circlePos
+    private var _circle = MutableLiveData<Point>(Point(0,0))
+    val circle: LiveData<Point>
+      get() = _circle
 
-
-    init {
-        _circlePos.value = Point(0,0)
+    fun setCircle(c:Point) {
+        _circle.value = c
+    }
+    fun getCircle(): Point {
+        return _circle.value!!
     }
 
-    // setter Funktionen für die LiveData
-    fun setCirclePos(x:Int, y:Int) {
-        Log.i(TAG, "setCirclePos $x $y")
-        _circlePos.value = Point(x, y)
-    }
 
-    // getter Funktionen für die LiveData
-    fun getCirclePos(): Point {
-        return _circlePos.value!!
-    }
+    // Variable Daten
+    var clickCounter = 0
+    var startTime = 0L
+    var elapsedTime = 0L
 
-    // sonstige variable Daten, nicht als LiveData
+    var nickname = "anonymous"
+    var highscoreList = ArrayList<HighScoreListItem>()
 
-    private var _clickCounter = 0
-    val clickCounter: Int
-       get() = _clickCounter
-
-
-    fun incClickCounter() {
-        _clickCounter++
-    }
-
-    fun resetClickCounter() {
-        _clickCounter = 0
-    }
-
+    inner class HighScoreListItem(val nickname: String, val time: Long) {}
 }
+

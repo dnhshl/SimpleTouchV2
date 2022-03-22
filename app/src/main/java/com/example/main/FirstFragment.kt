@@ -26,12 +26,7 @@ class FirstFragment : Fragment() {
     private var _binding: FragmentFirstBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: MainViewModel by viewModels()
-
-    private var startTime: Long = 0
-    private var elapsedTime: Long = 0
-
-
+    private val vm: MainViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,21 +39,31 @@ class FirstFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-         binding.gameView.apply {
+        // Initialisierung des GameViews
+        binding.gameView.apply {
             setOnTouchListener { view, motionEvent -> evaluateTouch(view, motionEvent) }
-            setBackgroundColor(viewModel.BACKGROUND_COLOR)
-            setCircleRadius(viewModel.CIRCLE_RADIUS)
-            setCircleColor(viewModel.CIRCLE_COLOR)
+            setBackgroundColor(vm.BACKGROUND_COLOR)
+            setCircleRadius(vm.CIRCLE_RADIUS)
+            setCircleColor(vm.CIRCLE_COLOR)
 
+            // zu diesem Zeitpunkt ist die Dimension des GameViews (Höhe und Breite)
+            // noch nicht bekannt. Wir brauchen diese Info aber, um den Kreis initial
+            // in der Mitte des Bildschirms darzustellen.
+            // die Funktion doOnLayout trägt dafür sorge, dass die Positionsberechnung
+            // erst dann ausgeführt wird, wenn Höhe und Breite bekannt sind
             doOnLayout { view ->
-                viewModel.setCirclePos(view.measuredWidth/2, view.measuredHeight/2)
+                vm.setCircle(Point(view.measuredWidth/2, view.measuredHeight/2))
             }
         }
 
-        viewModel.circlePos.observe(viewLifecycleOwner) { circlePos ->
-            binding.gameView.setCirclePos(circlePos.x, circlePos.y)
+        // Observer auf die Circle LiveData
+        vm.circle.observe(viewLifecycleOwner) { circle ->
+            // Circle Position im GameView aktualisieren
+            binding.gameView.setCirclePos(circle)
+            // GameView neu darstellen
             binding.gameView.invalidate()
         }
+
     }
 
     override fun onDestroyView() {
@@ -66,61 +71,88 @@ class FirstFragment : Fragment() {
         _binding = null
     }
 
-
+    // Funktion, die bei Touch Events aufgerufen wird
     private fun evaluateTouch(view: View, motionEvent: MotionEvent): Boolean {
         val action = motionEvent.action
         val x = motionEvent.x
         val y = motionEvent.y
 
-
+        // Abbruch, wenn kein ACTION_DOWN Event
         if (action != MotionEvent.ACTION_DOWN) return false
 
-        // Wenn Klick außerhalb vom Kreis, mache nichts
+        // Abbruch, wenn Klick nicht innerhalb des Kreises
         if (!clickInCircle(x, y)) return false
 
         // ab hier Code, wenn Klick innerhalb des Kreises
 
         // do at game start
-        if (viewModel.clickCounter == 0) {
+        if (vm.clickCounter == 0) {
             // starte Timer
-            startTime = SystemClock.elapsedRealtime()
+            vm.startTime = SystemClock.elapsedRealtime()
+            // blende TextView aus
             binding.textView.visibility = View.INVISIBLE
         }
-        viewModel.incClickCounter()
-        val newCirclePos = newCirclePos()
-        viewModel.setCirclePos(newCirclePos.x, newCirclePos.y)
+
+        // bei jedem erfolgreichen Klick
+        // clickCounter hochzählen
+        vm.clickCounter++
+        // neue zufällige Circleposition
+        vm.setCircle(newCirclePos())
+
         // do at game end
-        if (viewModel.clickCounter == viewModel.MAX_CLICKS) {
-            // stoppe Timer
-            elapsedTime = SystemClock.elapsedRealtime() - startTime
-            viewModel.resetClickCounter()
-            val x = binding.gameView.width/2
-            val y = binding.gameView.height/2
-            viewModel.setCirclePos(x,y)
+        if (vm.clickCounter == vm.MAX_CLICKS) {
+            // stoppe Timer, berechne abgelaufene Zeit
+            vm.elapsedTime = SystemClock.elapsedRealtime() - vm.startTime
             // Display Game Results
             binding.textView.visibility = View.VISIBLE
-            binding.textView.text = getString(R.string.game_over).format(elapsedTime.toString())
+            binding.textView.text = getString(R.string.game_over).format(vm.elapsedTime.toString())
+            updateHighscoreList()
+            // reset für nächstes Spiel
+            vm.clickCounter = 0
+            val x = binding.gameView.width/2
+            val y = binding.gameView.height/2
+            vm.setCircle(Point(x,y))
         }
         return true
     }
 
+    // Hilfsfunktionen
+
+    // true, wenn (x,y) innerhalb des circles
     private fun clickInCircle(x: Float, y: Float): Boolean {
-        val c = viewModel.getCirclePos()
+        val c = vm.getCircle()
         val dx = x - c.x
         val dy = y - c.y
-        var r = viewModel.CIRCLE_RADIUS
-        Log.i(TAG, "${c.toString()} ${dx*dx + dy*dy}, ${r*r}" )
+        var r = vm.CIRCLE_RADIUS
         if (dx*dx + dy*dy < r*r) return true
         return false
     }
 
+    // zufällige neue Postion des Kreises
     private fun newCirclePos(): Point {
         val w = binding.gameView.width
         val h = binding.gameView.height
-        val r = viewModel.CIRCLE_RADIUS.toInt()
+        val r = vm.CIRCLE_RADIUS.toInt()
+        val rand = Random()
+        // rand.nextInt(ZAHL) liefert Ihnen eine Zufallszahl zwischen 0 und ZAHL
         val dx = w - 2*r
         val dy = h - 2*r
-        val rand = Random()
+
         return Point((r + rand.nextInt(dx)), r + rand.nextInt(dy))
+    }
+
+    // Eintrag in der Highscoreliste
+    private fun updateHighscoreList() {
+        // ergänze in der Highscore Liste
+        vm.highscoreList.add(vm.HighScoreListItem(vm.nickname, vm.elapsedTime))
+        // sortiere die Liste nach der besten Zeit
+        vm.highscoreList.sortBy {listentry -> listentry.time}
+        // wenn die Liste länger ist, als vorgesehen, dann entferne den
+        // schlechtesten Eintrag
+        if (vm.highscoreList.size > vm.MAX_TOP_SCORES) vm.highscoreList.removeLast()
+        // fürs debuggen Ausgabe der Liste
+        vm.highscoreList.forEach {
+            Log.i(TAG, "${it.nickname} ${it.time}")
+        }
     }
 }

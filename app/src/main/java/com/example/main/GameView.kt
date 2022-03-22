@@ -30,9 +30,8 @@ class GameView(context : Context?, attrs : AttributeSet?) : View(context, attrs)
         paint.color = color
     }
 
-    fun setCirclePos(x: Int, y: Int) {
-        circlePos.x = x
-        circlePos.y = y
+    fun setCirclePos(p: Point) {
+        circlePos = p
     }
 
     override fun onDraw(canvas: Canvas) {
