@@ -37,17 +37,25 @@ class FirstFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-         binding.gameView.apply {
-            setOnTouchListener { view, motionEvent -> evaluateTouch(view, motionEvent) }
-            setBackgroundColor(viewModel.BACKGROUND_COLOR)
-            setCircleRadius(viewModel.CIRCLE_RADIUS)
-            setCircleColor(viewModel.CIRCLE_COLOR)
-
-            doOnLayout { view ->
-                setPoint(view.measuredWidth/2, view.measuredHeight/2)
-                invalidate()
-            }
+        binding.gameView.setOnTouchListener { view, motionEvent ->
+            evaluateTouch(view, motionEvent)
         }
+    }
+
+
+
+    private fun evaluateTouch(view: View, motionEvent: MotionEvent): Boolean {
+        val action = motionEvent.action
+        val x = motionEvent.x
+        val y = motionEvent.y
+
+        if (action == MotionEvent.ACTION_DOWN) {
+            Log.i(TAG,"Action DOWN at ($x, $y)")
+            binding.gameView.setCirclePos(x.toInt(), y.toInt())
+            binding.gameView.invalidate()
+        }
+
+        return true
     }
 
     override fun onDestroyView() {
@@ -56,16 +64,4 @@ class FirstFragment : Fragment() {
     }
 
 
-    private fun evaluateTouch(view: View, motionEvent: MotionEvent): Boolean {
-        val action = motionEvent.action
-        val x = motionEvent.x
-        val y = motionEvent.y
-
-        when (action){
-            MotionEvent.ACTION_DOWN -> Log.i(TAG,"Action DOWN at ($x, $y)")
-            MotionEvent.ACTION_UP -> Log.i(TAG,"Action UP at ($x, $y)")
-            MotionEvent.ACTION_MOVE -> Log.i(TAG,"Action MOVE at ($x, $y)")
-        }
-        return true
-    }
 }
