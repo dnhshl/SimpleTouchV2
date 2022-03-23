@@ -5,5 +5,14 @@
     <string name="start_game">Starte Spiel durch Klick auf Kreis</string>
     <string name="game_over">%s ms\nStarte neues Spiel durch Klick auf Kreis</string>
     <string name="highscore_list_item">%s: %s ms</string>
+    <string name="action_nickname">Nickname ändern</string>
+    <string name="action_highscore">Highscores anzeigen</string>
+
+    <string name="dialog_cancel">Abbruch</string>
+    <string name="dialog_OK">OK</string>
+    <string name="dialog_nickname_title">Nickname eingeben</string>
+
+    <string name="highscore_no_entry">Es liegt noch kein Highscore vor</string>
+    <string name="dialog_highscore_title">Highscores</string>
 
 </resources>

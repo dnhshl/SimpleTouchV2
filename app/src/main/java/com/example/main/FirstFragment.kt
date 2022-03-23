@@ -10,6 +10,7 @@ import android.view.*
 import android.widget.ImageView
 import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.main.databinding.FragmentFirstBinding
@@ -26,7 +27,7 @@ class FirstFragment : Fragment() {
     private var _binding: FragmentFirstBinding? = null
     private val binding get() = _binding!!
 
-    private val vm: MainViewModel by viewModels()
+    private val vm: MainViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -109,9 +110,9 @@ class FirstFragment : Fragment() {
             updateHighscoreList()
             // reset für nächstes Spiel
             vm.clickCounter = 0
-            val x = binding.gameView.width/2
-            val y = binding.gameView.height/2
-            vm.setCircle(Point(x,y))
+            val x0 = binding.gameView.width/2
+            val y0 = binding.gameView.height/2
+            vm.setCircle(Point(x0,y0))
         }
         return true
     }
